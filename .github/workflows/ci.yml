@@ -29,7 +29,10 @@ jobs:
           pip install numpy
       - name: Install scikit-learn
         run: |
-          pip install scikit-learn
+          pip install -U scikit-learn
+      - name: Install matplotlib
+        run: |
+          pip install matplotlib
       - name: Test with pytest
         run: |
           python -m pytest -vv test/*py
