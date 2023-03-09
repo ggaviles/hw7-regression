@@ -42,8 +42,8 @@ def test_prediction():
     # by my LogisticRegressor
     error = np.mean(sklearn_pred_labels != pred_labels)
 
-    # Check that the mean error between sklearn label prediction and my LogisticRegressor prediction is less than 60%
-    assert error * 100 < 60
+    # Check that the mean error between sklearn label prediction and my LogisticRegressor prediction is less than 50%
+    assert error * 100 < 50
 
 def test_loss_function():
     # Test dataset
