@@ -140,8 +140,9 @@ class LogisticRegressor(BaseRegressor):
         """
         if X.shape[1] == self.num_feats:
             X = np.hstack([X, np.ones((X.shape[0], 1))])
-        #y_pred = X.dot(self.W).flatten()
 
+        # The predicted labels for given X is the sigmoidal function of dot product of the matrix of feature values X
+        # and the matrix of weights.
         y_pred = 1/(1 + np.exp(-X.dot(self.W)))
         y_pred = np.rint(y_pred)
         y_pred = np.asarray(y_pred, dtype='int')
@@ -155,17 +156,20 @@ class LogisticRegressor(BaseRegressor):
         Arguments:
             y_true (np.array): True labels.
             y_pred (np.array): Predicted labels.
+            reg_param (int): Regularization parameter.
 
         Returns:
             The mean loss (a single number).
         """
         y_pred = np.clip(y_pred, 1e-9, 1 - 1e-9)
 
-        """term_0 = (1 - y_true) * np.log(1 - y_pred + 1e-7)
-        term_1 = y_true * np.log(y_pred + 1e-7)
-        cost = -np.mean(term_0 + term_1, axis=0)"""
+        # Calculate the separable parts of the loss function
         y_zero_loss = y_true * np.log(y_pred)
         y_one_loss = (1-y_true) * np.log(1 - y_pred)
+
+        # For regularized logistic regression, add a regularization term to the binary cross entropy loss function.
+        # Here, I am implementing L2 regularization so the additional term consists of
+        # a regularization parameter multiplied by the L2 norm of the weights.
         regularization_term = reg_param/(2 * len(y_true)) * np.linalg.norm(self.W)
         return -np.mean(y_zero_loss + y_one_loss) + regularization_term
 
@@ -177,13 +181,19 @@ class LogisticRegressor(BaseRegressor):
         Arguments:
             y_true (np.array): True labels.
             X (np.ndarray): Matrix of feature values.
-
+            reg_param (int): Regularization parameter.
         Returns:
             Vector of gradients.
         """
         y_pred = self.make_prediction(X)
         error = y_true - y_pred
         cost_grad = -X.T.dot(error) / len(y_true)
+
+        # The partial derivative of the above regularization term w.r.t the weights
+        # is 2 * regularization parameter * weights.
         reg_grad = 2 * reg_param * self.W
+
+        # Add the derivative of the regularization term in the loss function to the derivative of the loss function
+        # to calculate the gradient of the regularized loss function
         grad = cost_grad + reg_grad
         return grad
