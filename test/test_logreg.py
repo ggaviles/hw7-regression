@@ -15,6 +15,7 @@ import sklearn.linear_model
 import regression.utils
 import regression.logreg
 import numpy as np
+from sklearn.metrics import log_loss
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, confusion_matrix
 
@@ -32,7 +33,6 @@ def test_prediction():
 	model = regression.logreg.LogisticRegressor(num_feats=X.shape[1], learning_rate=0.001, max_iter=1000,
 												batch_size=5, reg_param=0.5)
 
-	# Train model on
 	model.train_model(X_train, y_train, X_test, y_test)
 	pred_labels = model.make_prediction(X_test)
 
@@ -44,26 +44,43 @@ def test_prediction():
 	assert error*100 < 30
 
 def test_loss_function():
-	pass
+	x = np.array([-2.2, -1.4, -.8, .2, .4, .8, 1.2, 2.2, 2.9, 4.6])
+	y = np.array([0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
+
+	# sklearn implementation of binary cross entropy loss function
+	logr = LogisticRegression(solver='lbfgs')
+	logr.fit(x.reshape(-1, 1), y)
+
+	y_pred = logr.predict_proba(x.reshape(-1, 1))[:, 1].ravel()
+	sklearn_loss = log_loss(y, y_pred)
+
+	# LogisticRegressor implementation of binary cross entropy loss function
+	y_pred = np.clip(y_pred, 1e-9, 1 - 1e-9)
+
+	# Calculate the separable parts of the loss function
+	y_zero_loss = y * np.log(y_pred)
+	y_one_loss = (1 - y) * np.log(1 - y_pred)
+
+	model_loss = -np.mean(y_zero_loss + y_one_loss)
+
+	assert sklearn_loss == model_loss
 
 def test_gradient():
-	pass
+
 
 def test_training():
+	# Check that my weights update during training
 	X, y = regression.utils.loadDataset()
 	X_train, X_test, y_train, y_test = regression.utils.loadDataset(split_seed=16, split_percent=0.8)
-	sklearn_model = LogisticRegression(penalty='l2', C=4.0)
-	sklearn_model.fit(X_train, y_train)
-	sklearn_pred_labels = sklearn_model.predict(X_test)
-	print(sklearn_pred_labels)
 
 	model = regression.logreg.LogisticRegressor(num_feats=X.shape[1], learning_rate=0.001, max_iter=10000,
 												batch_size=10, reg_param=0.25)
+	prev_weights = model.W
 	model.train_model(X_train, y_train, X_test, y_test)
-	pred_labels = model.make_prediction(X_test)
-	print(pred_labels)
-	# print(f"Learned parameters: w = {model.W}")
+	weights_after_training = model.W
 
-	error = np.mean(sklearn_pred_labels != pred_labels)
-	print(error * 100)
+	# Check to see each weight changes after training.
+	assert (prev_weights != weights_after_training).any()
+
+
 
