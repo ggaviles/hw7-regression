@@ -26,7 +26,7 @@ You will find the full dataset in `data/nsclc.csv`. Class labels are encoded in 
   * complete the `loss_function` method
   * complete the `calculate_gradient` method
   * readable code with clear comments and method descriptions
-* [TODO] Write appropriate unit tests for each implemented function and for overall training procedure. See `test/test_logreg.py` for some suggested tests. (3 points)
+* [X] Write appropriate unit tests for each implemented function and for overall training procedure. See `test/test_logreg.py` for some suggested tests. (3 points)
 * [X] Package as a module using `pyproject.toml` and set up GitHub Actions to install your module and run your unit tests. Add a status badge to this README. (2 points)
 
 ## Getting started

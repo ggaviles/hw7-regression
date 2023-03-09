@@ -7,6 +7,7 @@ This is not an exhaustive list.
 - check that your gradient is being calculated correctly
 - check that your weights update during training
 """
+import math
 
 # Imports
 import pytest
@@ -15,7 +16,7 @@ import sklearn.linear_model
 import regression.utils
 import regression.logreg
 import numpy as np
-from sklearn.metrics import log_loss
+from sklearn.metrics import log_loss, mean_squared_error
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, confusion_matrix
 
@@ -46,6 +47,7 @@ def test_prediction():
 
 
 def test_loss_function():
+    # Test dataset
     x = np.array([-2.2, -1.4, -.8, .2, .4, .8, 1.2, 2.2, 2.9, 4.6])
     y = np.array([0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
 
@@ -69,8 +71,27 @@ def test_loss_function():
 
 
 def test_gradient():
-    pass
+    # Test dataset
+    x = np.array([-2.2, -1.4, -.8, .2, .4, .8, 1.2, 2.2, 2.9, 4.6])
+    y = np.array([0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0])
 
+    # sklearn implementation of the gradient of the binary cross entropy loss function
+    logr = LogisticRegression(solver='lbfgs')
+    logr.fit(x.reshape(-1, 1), y)
+
+    y_pred = logr.predict_proba(x.reshape(-1, 1))[:, 1].ravel()
+
+    # Another implementation of the gradient of the binary cross entropy loss function
+    logr_grad_val = []
+    for i in range(len(y)):
+        logr_grad_val.append(x[i] * (y_pred[i] - y[i]))
+    logr_grad = -np.mean(logr_grad_val)
+
+    # Logistic Regressor implementation of the gradient of the binary cross entropy loss function (w/o regularization)
+    error = y_pred - y
+    grad = -x.T.dot(error) / len(y)
+
+    assert math.isclose(grad, logr_grad, abs_tol=10**-16)
 
 def test_training():
     # Check that my weights update during training
