@@ -1,3 +1,5 @@
+import pathlib
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
@@ -44,7 +46,8 @@ def loadDataset(
     """
 
     # Read dataset
-    full_df = pd.read_csv("./data/nsclc.csv", index_col="ID")
+    data_dir = pathlib.Path(__file__).resolve().parent.parent / 'data'
+    full_df = pd.read_csv(data_dir / "nsclc.csv", index_col="ID")
     
     # Always include the class label
     if "NSCLC" not in features: 
