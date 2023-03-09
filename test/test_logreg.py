@@ -54,7 +54,7 @@ def test_loss_function():
 	y_pred = logr.predict_proba(x.reshape(-1, 1))[:, 1].ravel()
 	sklearn_loss = log_loss(y, y_pred)
 
-	# LogisticRegressor implementation of binary cross entropy loss function
+	# LogisticRegressor implementation of binary cross entropy loss function (without regularization)
 	y_pred = np.clip(y_pred, 1e-9, 1 - 1e-9)
 
 	# Calculate the separable parts of the loss function
@@ -66,7 +66,7 @@ def test_loss_function():
 	assert sklearn_loss == model_loss
 
 def test_gradient():
-
+	pass
 
 def test_training():
 	# Check that my weights update during training
