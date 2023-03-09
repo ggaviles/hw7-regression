@@ -27,13 +27,13 @@ def test_prediction():
 
     # Chose l2 penalty because also used L2 regularization in my implemented Logistic Regressor
     # Chose C to be 2 because I set my reg_param to be 0.5 and C is the inverse of the regularization parameter
-    sklearn_model = LogisticRegression(penalty='l2', C=2)
+    sklearn_model = LogisticRegression(penalty='l2', C=4)
     sklearn_model.fit(X_train, y_train)
     sklearn_pred_labels = sklearn_model.predict(X_test)
 
     # Initialize implemented regularized logistic regression model
     model = regression.logreg.LogisticRegressor(num_feats=X.shape[1], learning_rate=0.001, max_iter=1000,
-                                                batch_size=5, reg_param=0.5)
+                                                batch_size=10, reg_param=0.25)
 
     model.train_model(X_train, y_train, X_test, y_test)
     pred_labels = model.make_prediction(X_test)
